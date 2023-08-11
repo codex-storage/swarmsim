@@ -22,10 +22,10 @@ proc nextStep*(self: EventDrivenEngine): Option[Schedulable] =
   schedulable.scheduled(engine = self)
 
   some(schedulable)
-  
+
 proc run*(self: EventDrivenEngine): void =
   while self.nextStep().isSome:
     discard
-  
+
 export EventDrivenEngine
 export options

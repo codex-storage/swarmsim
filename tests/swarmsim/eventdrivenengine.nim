@@ -24,7 +24,7 @@ suite "event driven engine tests":
     let engine = EventDrivenEngine()
 
     engine.scheduleAll(schedulables)
-    
+
     for time in times.sorted:
       let result = engine.nextStep().get()
       check(result.time == time)
@@ -33,7 +33,3 @@ suite "event driven engine tests":
 
     for schedulable in schedulables:
       check(schedulable.scheduledAt == schedulable.time)
-
-    
-
-

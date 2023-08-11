@@ -1,19 +1,13 @@
 # Package
 
 version       = "0.1.0"
-author        = "gmega"
+author        = "Swarmsim Authors"
 description   = "Simple swarm simulator"
 license       = "MIT"
-srcDir        = "src"
+srcDir        = "."
 installExt    = @["nim"]
-bin           = @["swarm_sim"]
 
+requires "nim >= 1.6.0"
 
-# Dependencies
-
-requires "nim >= 2.0.0"
-
-
-# Tasks
 task test, "Run unit tests":
   exec "nim c -r tests/all_tests.nim"
