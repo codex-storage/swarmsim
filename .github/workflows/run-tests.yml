@@ -1,0 +1,17 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    name: Ubuntu, Nim 1.6.12
+    steps:
+    - uses: actions/checkout@v2
+    - uses: iffy/install-nim@v3
+      with:
+        version: 1.6.12
+    - name: Install Deps
+      run: nimble install -y
+    - name: Run tests
+      run: nimble test -y
