@@ -21,7 +21,7 @@ suite "event driven engine tests":
 
     for time in times.sorted:
       let result = engine.nextStep().get()
-      check(result.time == engine.current_time)
+      check(result.time == engine.currentTime)
 
     check(engine.nextStep().isNone)
 
@@ -32,14 +32,13 @@ suite "event driven engine tests":
     let engine = EventDrivenEngine()
     let handles = schedulables.map(schedulable => engine.awaitableSchedule(schedulable))
 
-    check(engine.current_time == 0)
+    check(engine.currentTime == 0)
 
     handles[4].doAwait()
-    check(engine.current_time == 5)
+    check(engine.currentTime == 5)
 
     handles[7].doAwait()
-    check(engine.current_time == 8)
-
+    check(engine.currentTime == 8)
 
   test "should not allow schedulables to be scheduled in the past":
     let e1 = SchedulableEvent(time: 10)
@@ -51,6 +50,20 @@ suite "event driven engine tests":
 
     expect(Defect):
       engine.schedule(e2)
+
+  test "should allow clients to cancel scheduled events":
+    let e1 = SchedulableEvent(time: 8)
+    let e2 = SchedulableEvent(time: 10)
+
+    let engine = EventDrivenEngine()
+
+    let e1Handle = engine.awaitableSchedule(e1)
+    let e2Handle = engine.awaitableSchedule(e2)
+
+    e1Handle.schedulable.cancel()
+    e2Handle.doAwait()
+
+    check(engine.currentTime == 10)
 
 
 

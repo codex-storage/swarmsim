@@ -4,10 +4,12 @@ import std/random
 
 import ./types
 import ./protocol
+import ./eventdrivenengine
 
 export options
 export tables
 export protocol
+export eventdrivenengine
 export Peer
 
 proc getProtocol*(self: Peer, protocolId: string): Option[Protocol] =
@@ -16,9 +18,9 @@ proc getProtocol*(self: Peer, protocolId: string): Option[Protocol] =
 
   none(Protocol)
 
-proc deliver*(self: Peer, message: Message): void =
+proc deliver*(self: Peer, message: Message, engine: EventDrivenEngine, network: Network): void =
   self.getProtocol(message.messageType).map(
-    proc (p: Protocol): void = p.deliver(message))
+    proc (p: Protocol): void = p.deliver(message, engine, network))
 
 proc initPeer(self: Peer, protocols: seq[Protocol]): Peer =
   # XXX integer indexes or an enum would be better, but this is easier

@@ -13,6 +13,7 @@ export Network
 
 type
   ScheduledMessage = ref object of SchedulableEvent
+    network: Network
     message: Message
 
 proc new*(
@@ -41,10 +42,11 @@ proc send*(self: Network, message: Message,
 
   self.engine.awaitableSchedule(
     ScheduledMessage(
-      time: self.engine.current_time + delay,
-      message: message
+      time: self.engine.currentTime + delay,
+      message: message,
+      network: self
     )
   )
 
 method atScheduledTime*(self: ScheduledMessage, engine: EventDrivenEngine) =
-  self.message.receiver.deliver(self.message)
+  self.message.receiver.deliver(self.message, engine, self.network)

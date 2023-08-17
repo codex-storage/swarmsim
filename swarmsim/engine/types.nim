@@ -2,9 +2,11 @@ import std/heapqueue
 import std/tables
 import std/sets
 import std/options
+import std/random
 
 export heapqueue
 export option
+export random
 
 type
   SchedulableEvent* = ref object of RootObj
@@ -12,13 +14,14 @@ type
     ## at a well-defined point in simuliation time.
     ##
     time*: uint64
+    cancelled*: bool
 
 type
   EventDrivenEngine* = ref object of RootObj
     ## An `EventDrivenEngine` is a simple simulation engine that executes events in the order of their
     ## scheduled time.
     ##
-    current_time*: uint64
+    currentTime*: uint64
     queue*: HeapQueue[SchedulableEvent]
 
 type

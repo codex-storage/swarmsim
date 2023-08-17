@@ -10,7 +10,8 @@ type
   FakeProtocol = ref object of Protocol
     received: bool
 
-method uncheckedDeliver(self: FakeProtocol, message: Message) =
+method uncheckedDeliver(self: FakeProtocol, message: Message,
+    engine: EventDrivenEngine, network: Network) =
   self.received = true
 
 proc getFakeProtocol(peer: Peer, protocolId: string): FakeProtocol =

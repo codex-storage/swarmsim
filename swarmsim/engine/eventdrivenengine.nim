@@ -9,15 +9,15 @@ export EventDrivenEngine
 
 type
   AwaitableHandle* = object of RootObj
-    schedulable: SchedulableEvent
+    schedulable*: SchedulableEvent
     engine: EventDrivenEngine
 
-proc current_time*(self: EventDrivenEngine): uint64 {.inline.} = self.current_time
+proc currentTime*(self: EventDrivenEngine): uint64 {.inline.} = self.currentTime
 
 proc schedule*(self: EventDrivenEngine, schedulable: SchedulableEvent): void =
-  if schedulable.time < self.current_time:
+  if schedulable.time < self.currentTime:
     raise (ref Defect)(
-      msg: fmt"Cannot schedule an event in the past ({schedulable.time}) < ({self.current_time})")
+      msg: fmt"Cannot schedule an event in the past ({schedulable.time}) < ({self.currentTime})")
   self.queue.push(schedulable)
 
 proc awaitableSchedule*(self: EventDrivenEngine, schedulable: SchedulableEvent): AwaitableHandle =
@@ -29,17 +29,19 @@ proc scheduleAll*[T: SchedulableEvent](self: EventDrivenEngine, schedulables: se
     self.schedule(schedulable)
 
 proc nextStep*(self: EventDrivenEngine): Option[SchedulableEvent] =
-  if len(self.queue) == 0:
-    return none(SchedulableEvent)
 
-  let schedulable = self.queue.pop()
-  self.current_time = schedulable.time
-  schedulable.atScheduledTime(engine = self)
+  while len(self.queue) > 0:
+    let schedulable = self.queue.pop()
+    self.currentTime = schedulable.time
 
-  some(schedulable)
+    if not schedulable.cancelled:
+      schedulable.atScheduledTime(engine = self)
+      return some(schedulable)
+
+  return none(SchedulableEvent)
 
 proc runUntil*(self: EventDrivenEngine, until: uint64): void =
-  while self.nextStep().isSome and self.current_time < until:
+  while self.nextStep().isSome and self.currentTime < until:
     discard
 
 proc run*(self: EventDrivenEngine): void =
