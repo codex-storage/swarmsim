@@ -5,6 +5,12 @@ import ./types
 import ./peer
 import ./eventdrivenengine
 
+export options
+export sets
+export peer
+export eventdrivenengine
+export Network
+
 type
   ScheduledMessage = ref object of SchedulableEvent
     message: Message
@@ -42,9 +48,3 @@ proc send*(self: Network, message: Message,
 
 method atScheduledTime*(self: ScheduledMessage, engine: EventDrivenEngine) =
   self.message.receiver.deliver(self.message)
-
-export Network
-export peer
-export eventdrivenengine
-export options
-export sets

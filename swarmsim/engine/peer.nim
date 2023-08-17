@@ -5,12 +5,10 @@ import std/random
 import ./types
 import ./protocol
 
-## TODO a "readonly" pragma could probably be my first macro
-proc `peerId=`*(self: Peer, id: int): void {.error: "Cannot assign to `peerId` property of `Peer`.".}
-
-proc `protocols=`*(self: Peer, value: Table[string, Protocol]): void {.error: "Cannot assign to `protocols` property of `Peer`.".}
-
-proc `protocols`*(self: Peer): Table[string, Protocol] {.error: "Cannot read from `protocols` property of `Peer`.".}
+export options
+export tables
+export protocol
+export Peer
 
 proc getProtocol*(self: Peer, protocolId: string): Option[Protocol] =
   if self.protocols.hasKey(protocolId):
@@ -34,13 +32,9 @@ proc hash*(self: Peer): int = self.peerId
 proc new*(
   T: type Peer,
   protocols: seq[Protocol],
-  peerId: Option[int] = none(int)
+  peerId: Option[int] = none(int),
 ): Peer =
   # XXX I can't have put this in the init proc as that would mean allowing public
   #   write access to every field in Peer. Not sure how to solve this in nim.
   let peerId = peerId.get(rand(high(int)))
   initPeer(Peer(protocols: initTable[string, Protocol](), peerId: peerId), protocols)
-
-export Peer
-export options
-export tables

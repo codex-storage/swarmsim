@@ -3,6 +3,9 @@ import std/tables
 import std/sets
 import std/options
 
+export heapqueue
+export option
+
 type
   SchedulableEvent* = ref object of RootObj
     ## A `SchedulableEvent` is an event that can be scheduled for execution in an `EventDrivenEngine`
@@ -44,6 +47,3 @@ type
     engine*: EventDrivenEngine
     defaultLinkDelay*: uint64
     peers*: HashSet[Peer] # TODO: use an array
-
-export heapqueue
-export option

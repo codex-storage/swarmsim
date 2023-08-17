@@ -1,5 +1,7 @@
 import ./types
 
+export SchedulableEvent
+
 func `<`*(self: SchedulableEvent, other: SchedulableEvent): bool =
   return self.time < other.time
 
@@ -10,5 +12,3 @@ method atScheduledTime*(self: SchedulableEvent, engine: EventDrivenEngine): void
   ## default, it does nothing.
   ##
   discard
-
-export SchedulableEvent

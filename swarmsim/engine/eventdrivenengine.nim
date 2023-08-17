@@ -4,8 +4,11 @@ import std/strformat
 import ./types
 import ./schedulableevent
 
+export options
+export EventDrivenEngine
+
 type
-  AwaitableHandle = object of RootObj
+  AwaitableHandle* = object of RootObj
     schedulable: SchedulableEvent
     engine: EventDrivenEngine
 
@@ -44,7 +47,3 @@ proc run*(self: EventDrivenEngine): void =
 
 proc doAwait*(self: AwaitableHandle): void =
   self.engine.runUntil(self.schedulable.time)
-
-export EventDrivenEngine
-export AwaitableHandle
-export options

@@ -22,12 +22,12 @@ suite "network":
   test "should dispatch message to the correct protocol within a peer":
     let engine = EventDrivenEngine()
 
-    var protocols: seq[Protocol] = newSeq[Protocol]()
-
-    protocols.add(FakeProtocol(messageType: "protocol1", received: false))
-    protocols.add(FakeProtocol(messageType: "protocol2", received: false))
-
-    let peer = Peer.new(protocols = protocols)
+    let peer = Peer.new(
+      protocols = @[
+        Protocol FakeProtocol(messageType: "protocol1", received: false),
+        FakeProtocol(messageType: "protocol2", received: false)
+      ]
+    )
     let network = Network.new(engine = engine, defaultLinkDelay = 20)
 
     network.add(peer)
