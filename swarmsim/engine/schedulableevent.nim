@@ -10,8 +10,9 @@ proc cancel*(self: SchedulableEvent) =
   ##
   self.cancelled = true
 
-method atScheduledTime*(self: SchedulableEvent, engine: EventDrivenEngine): void {.base.} =
-  ## Callback invoked by the event engine indicating that this event is due for execution. By
-  ## default, it does nothing.
+method atScheduledTime*(self: SchedulableEvent,
+    engine: EventDrivenEngine): void {.base.} =
+  ## Callback invoked by the event engine indicating that this event is due
+  ## for execution.
   ##
-  discard
+  raise newException(CatchableError, "Method without implementation override")

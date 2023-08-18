@@ -1,6 +1,7 @@
 import std/tables
 import std/options
 import std/random
+import std/hashes
 
 import ./types
 import ./protocol
@@ -18,7 +19,8 @@ proc getProtocol*(self: Peer, protocolId: string): Option[Protocol] =
 
   none(Protocol)
 
-proc deliver*(self: Peer, message: Message, engine: EventDrivenEngine, network: Network): void =
+proc deliver*(self: Peer, message: Message, engine: EventDrivenEngine,
+    network: Network): void =
   self.getProtocol(message.messageType).map(
     proc (p: Protocol): void = p.deliver(message, engine, network))
 
@@ -29,7 +31,7 @@ proc initPeer(self: Peer, protocols: seq[Protocol]): Peer =
 
   self
 
-proc hash*(self: Peer): int = self.peerId
+proc hash*(self: Peer): Hash = self.peerId.hash
 
 proc new*(
   T: type Peer,

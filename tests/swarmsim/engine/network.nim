@@ -3,7 +3,6 @@ import unittest
 import pkg/swarmsim/engine/eventdrivenengine
 import pkg/swarmsim/engine/network
 import pkg/swarmsim/engine/peer
-import pkg/swarmsim/engine/message
 import pkg/swarmsim/engine/protocol
 
 type
@@ -33,8 +32,8 @@ suite "network":
 
     network.add(peer)
 
-    let m1 = Message.new(receiver = peer, messageType = "protocol1")
-    let m2 = Message.new(receiver = peer, messageType = "protocol2")
+    let m1 = Message(receiver: peer, messageType: "protocol1")
+    let m2 = Message(receiver: peer, messageType: "protocol2")
 
     let message2handle = network.send(m2, linkDelay = uint64(10).some)
     let message1handle = network.send(m1, linkDelay = uint64(5).some)

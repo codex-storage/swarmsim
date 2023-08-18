@@ -20,8 +20,8 @@ proc new*(
   T: type Network,
   engine: EventDrivenEngine,
   defaultLinkDelay: uint64 = 0
-): T =
-  return Network(
+): Network =
+  Network(
     engine: engine,
     defaultLinkDelay: defaultLinkDelay,
     peers: HashSet[Peer]()
