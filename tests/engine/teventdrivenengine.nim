@@ -16,7 +16,7 @@ suite "event driven engine tests":
 
   test "should run schedulables at the right time":
 
-    let times = @[1'u64, 10, 5].map(time => time)
+    let times = @[1'u64, 10, 5]
     let schedulables = times.map(time => TestSchedulable(time: time))
 
     let engine = EventDrivenEngine()
