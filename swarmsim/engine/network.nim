@@ -9,7 +9,7 @@ export options
 export sets
 export peer
 export eventdrivenengine
-export Network
+export types
 
 type
   ScheduledMessage = ref object of SchedulableEvent
