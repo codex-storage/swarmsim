@@ -1,8 +1,8 @@
-import ./swarmsim/engine/eventdrivenengine
-import ./swarmsim/engine/schedulableevent
-import ./swarmsim/engine/network
-import ./swarmsim/engine/peer
-import ./swarmsim/codex/dhttracker
+import engine/teventdrivenengine
+import engine/tschedulableevent
+import engine/tnetwork
+import engine/tpeer
+import codex/tdhttracker
 
 {.warning[UnusedImport]: off.}
 
