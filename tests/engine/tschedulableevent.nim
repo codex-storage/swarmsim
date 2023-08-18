@@ -1,6 +1,6 @@
 import unittest
 
-import pkg/swarmsim/engine/schedulableevent
+import swarmsim/engine/schedulableevent
 
 suite "schedulable event":
   test "should be ordered by time":

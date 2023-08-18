@@ -4,8 +4,8 @@ import sugar
 
 import std/algorithm
 
-import pkg/swarmsim/engine/schedulableevent
-import pkg/swarmsim/engine/eventdrivenengine
+import swarmsim/engine/schedulableevent
+import swarmsim/engine/eventdrivenengine
 
 type TestSchedulable = ref object of SchedulableEvent
 

@@ -1,7 +1,7 @@
 import std/unittest
 import std/sets
 
-import pkg/swarmsim/engine/peer
+import swarmsim/engine/peer
 
 suite "peer":
   test "should allow inclusion and membership tests on a HashSet":
