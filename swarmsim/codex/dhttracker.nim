@@ -16,13 +16,13 @@ type
   PeerDescriptor* = ref object of RootObj
     peerId*: int
     lastSeen*: uint64
-    expiryTimer: AwaitableHandle
+    expirationTimer: AwaitableHandle
 
 type ArrayShuffler = proc (arr: var seq[PeerDescriptor]): void
 
 type
   DHTTracker* = ref object of Protocol
-    expiryTimer*: Duration
+    expirationTimer*: Duration
     maxPeers*: uint
     peers: OrderedTable[int, PeerDescriptor]
     shuffler: ArrayShuffler
@@ -33,7 +33,7 @@ type
   SampleSwarm* = ref object of Message
     numPeers: uint
 
-  ExpiryTimer* = ref object of SchedulableEvent
+  ExpirationTimer* = ref object of SchedulableEvent
     peerId*: int
     tracker: DHTTracker
 
@@ -48,11 +48,11 @@ proc new*(
   T: type DHTTracker,
   maxPeers: uint,
   shuffler: ArrayShuffler = RandomShuffler,
-  expiryTimer: Duration = DHTTracker.defaultExpiry,
+  expirationTimer: Duration = DHTTracker.defaultExpiry,
 ): DHTTracker =
   DHTTracker(
     # This should in general be safe as those are always positive.
-    expiryTimer: expiryTimer,
+    expirationTimer: expirationTimer,
     maxPeers: maxPeers,
     shuffler: shuffler,
     peers: initOrderedTable[int, PeerDescriptor](),
@@ -62,17 +62,17 @@ proc new*(
 proc peers*(self: DHTTracker): seq[PeerDescriptor] = self.peers.values.toSeq()
 
 proc cancelExpiryTimer(self: DHTTracker, peerId: int) =
-  self.peers[peerId].expiryTimer.schedulable.cancel()
+  self.peers[peerId].expirationTimer.schedulable.cancel()
 
 proc createExpiryTimer(self: DHTTracker, peerId: int,
     engine: EventDrivenEngine): AwaitableHandle =
-  let expiryTimer = ExpiryTimer(
+  let expirationTimer = ExpirationTimer(
     peerId: peerId,
     tracker: self,
-    time: engine.currentTime + uint64(self.expiryTimer.inSeconds())
+    time: engine.currentTime + uint64(self.expirationTimer.inSeconds())
   )
 
-  engine.awaitableSchedule(expiryTimer)
+  engine.awaitableSchedule(expirationTimer)
 
 proc oldestInsertion(self: DHTTracker): int =
   # We maintain the invariant that the first element to have been inserted
@@ -97,10 +97,10 @@ proc addPeer(self: DHTTracker, message: PeerAnnouncement,
   self.peers[peerId] = PeerDescriptor(
     peerId: message.peerId,
     lastSeen: engine.currentTime,
-    expiryTimer: self.createExpiryTimer(peerId, engine)
+    expirationTimer: self.createExpiryTimer(peerId, engine)
   )
 
-method atScheduledTime*(self: ExpiryTimer, engine: EventDrivenEngine): void =
+method atScheduledTime*(self: ExpirationTimer, engine: EventDrivenEngine): void =
   self.tracker.peers.del(self.peerId)
 
 proc sampleSwarm(self: DHTTracker, message: SampleSwarm, network: Network) =

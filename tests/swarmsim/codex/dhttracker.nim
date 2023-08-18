@@ -56,7 +56,6 @@ suite "tracker node":
     check(len(peers) == 1)
     check(peers[0].peerId == 25)
 
-
   test "should drop descriptors after expiry time":
     announcePeer(network, trackerPeer, 25)
 
