@@ -16,13 +16,13 @@ type
   PeerDescriptor* = ref object of RootObj
     peerId*: int
     lastSeen*: uint64
-    expirationTimer: AwaitableHandle
+    peerExpiration: ScheduledEvent
 
 type ArrayShuffler = proc (arr: var seq[PeerDescriptor]): void
 
 type
   DHTTracker* = ref object of Protocol
-    expirationTimer*: Duration
+    peerExpiration*: Duration
     maxPeers*: uint
     peers: OrderedTable[int, PeerDescriptor]
     shuffler: ArrayShuffler
@@ -48,11 +48,11 @@ proc new*(
   T: type DHTTracker,
   maxPeers: uint,
   shuffler: ArrayShuffler = RandomShuffler,
-  expirationTimer: Duration = DHTTracker.defaultExpiry,
+  peerExpiration: Duration = DHTTracker.defaultExpiry,
 ): DHTTracker =
   DHTTracker(
     # This should in general be safe as those are always positive.
-    expirationTimer: expirationTimer,
+    peerExpiration: peerExpiration,
     maxPeers: maxPeers,
     shuffler: shuffler,
     peers: initOrderedTable[int, PeerDescriptor](),
@@ -62,17 +62,17 @@ proc new*(
 proc peers*(self: DHTTracker): seq[PeerDescriptor] = self.peers.values.toSeq()
 
 proc cancelExpiryTimer(self: DHTTracker, peerId: int) =
-  self.peers[peerId].expirationTimer.schedulable.cancel()
+  self.peers[peerId].peerExpiration.schedulable.cancel()
 
 proc createExpiryTimer(self: DHTTracker, peerId: int,
-    engine: EventDrivenEngine): AwaitableHandle =
-  let expirationTimer = ExpirationTimer(
+    engine: EventDrivenEngine): ScheduledEvent =
+  let peerExpiration = ExpirationTimer(
     peerId: peerId,
     tracker: self,
-    time: engine.currentTime + uint64(self.expirationTimer.inSeconds())
+    time: engine.currentTime + uint64(self.peerExpiration.inSeconds())
   )
 
-  engine.awaitableSchedule(expirationTimer)
+  engine.awaitableSchedule(peerExpiration)
 
 proc oldestInsertion(self: DHTTracker): int =
   # We maintain the invariant that the first element to have been inserted
@@ -81,23 +81,26 @@ proc oldestInsertion(self: DHTTracker): int =
   for peerId in self.peers.keys:
     return peerId
 
+proc removePeer(self: DHTTracker, peerId: int) =
+  self.cancelExpiryTimer(peerId)
+  self.peers.del(peerId)
+
 proc addPeer(self: DHTTracker, message: PeerAnnouncement,
     engine: EventDrivenEngine) =
 
   let peerId = message.peerId
 
   if peerId in self.peers:
-    self.cancelExpiryTimer(peerId)
+    # Makes sure that the most recently seen peer is always inserted last.
+    self.removePeer(peerId)
 
   elif uint(len(self.peers)) == self.maxPeers:
-    let oldest = self.oldestInsertion()
-    self.cancelExpiryTimer(oldest)
-    self.peers.del(oldest)
+    self.removePeer(self.oldestInsertion())
 
   self.peers[peerId] = PeerDescriptor(
     peerId: message.peerId,
     lastSeen: engine.currentTime,
-    expirationTimer: self.createExpiryTimer(peerId, engine)
+    peerExpiration: self.createExpiryTimer(peerId, engine)
   )
 
 method atScheduledTime*(self: ExpirationTimer, engine: EventDrivenEngine): void =

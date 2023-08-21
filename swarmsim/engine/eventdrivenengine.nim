@@ -10,7 +10,7 @@ export times
 export EventDrivenEngine
 
 type
-  AwaitableHandle* = object of RootObj
+  ScheduledEvent* = object of RootObj
     schedulable*: SchedulableEvent
     engine: EventDrivenEngine
 
@@ -24,9 +24,9 @@ proc schedule*(self: EventDrivenEngine, schedulable: SchedulableEvent): void =
   self.queue.push(schedulable)
 
 proc awaitableSchedule*(self: EventDrivenEngine,
-    schedulable: SchedulableEvent): AwaitableHandle =
+    schedulable: SchedulableEvent): ScheduledEvent =
   self.schedule(schedulable)
-  AwaitableHandle(schedulable: schedulable, engine: self)
+  ScheduledEvent(schedulable: schedulable, engine: self)
 
 proc scheduleAll*[T: SchedulableEvent](self: EventDrivenEngine,
     schedulables: seq[T]): void =
@@ -65,5 +65,5 @@ proc runUntil*(self: EventDrivenEngine, until: Duration): void =
 proc run*(self: EventDrivenEngine): void =
   self.runUntil(high(uint64))
 
-proc doAwait*(self: AwaitableHandle): void =
+proc doAwait*(self: ScheduledEvent): void =
   self.engine.runUntil(self.schedulable.time)
