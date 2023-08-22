@@ -78,7 +78,7 @@ suite "tracker node":
     engine.runUntil(2*DHTTracker.defaultExpiry + 1.dseconds)
     check(len(getPeerArray(trackerPeer)) == 0)
 
-  test "should drop oldest peers when table is full":
+  test "should drop least recently seen peer when table is full":
     announcePeer(network, trackerPeer, 25, delay = 0)
     announcePeer(network, trackerPeer, 35, delay = 1)
     announcePeer(network, trackerPeer, 45, delay = 2)
@@ -87,6 +87,7 @@ suite "tracker node":
 
     check(getPeerIdArray(trackerPeer).sorted == @[25, 35, 45, 55, 65])
 
+    announcePeer(network, trackerPeer, 25, delay = 1)
     announcePeer(network, trackerPeer, 75, delay = 1)
 
-    check(getPeerIdArray(trackerPeer).sorted == @[35, 45, 55, 65, 75])
+    check(getPeerIdArray(trackerPeer).sorted == @[25, 45, 55, 65, 75])

@@ -12,7 +12,7 @@ export eventdrivenengine
 export types
 
 type
-  ScheduledMessage = ref object of SchedulableEvent
+  MessageSend = ref object of SchedulableEvent
     network: Network
     message: Message
 
@@ -36,17 +36,17 @@ proc remove*(self: Network, peer: Peer) =
   self.peers.excl(peer)
 
 proc send*(self: Network, message: Message,
-  linkDelay: Option[uint64] = none(uint64)): AwaitableHandle =
+  linkDelay: Option[uint64] = none(uint64)): ScheduledEvent =
 
   let delay = linkDelay.get(self.defaultLinkDelay)
 
   self.engine.awaitableSchedule(
-    ScheduledMessage(
+    MessageSend(
       time: self.engine.currentTime + delay,
       message: message,
       network: self
     )
   )
 
-method atScheduledTime*(self: ScheduledMessage, engine: EventDrivenEngine) =
+method atScheduledTime*(self: MessageSend, engine: EventDrivenEngine) =
   self.message.receiver.deliver(self.message, engine, self.network)
