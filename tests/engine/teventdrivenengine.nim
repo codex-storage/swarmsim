@@ -4,8 +4,8 @@ import sugar
 
 import std/algorithm
 
-import pkg/swarmsim/engine/schedulableevent
-import pkg/swarmsim/engine/eventdrivenengine
+import swarmsim/engine/schedulableevent
+import swarmsim/engine/eventdrivenengine
 
 type TestSchedulable = ref object of SchedulableEvent
 
@@ -16,7 +16,7 @@ suite "event driven engine tests":
 
   test "should run schedulables at the right time":
 
-    let times = @[1, 10, 5].map(time => uint64(time))
+    let times = @[1'u64, 10, 5]
     let schedulables = times.map(time => TestSchedulable(time: time))
 
     let engine = EventDrivenEngine()
@@ -30,8 +30,8 @@ suite "event driven engine tests":
     check(engine.nextStep().isNone)
 
   test "should allow clients to wait until a scheduled event happens":
-    let times = @[1, 2, 3, 4, 5, 6, 7, 8]
-    let schedulables = times.map(time => TestSchedulable(time: uint64(time)))
+    let times = @[1'u64, 2, 3, 4, 5, 6, 7, 8]
+    let schedulables = times.map(time => TestSchedulable(time: time))
 
     let engine = EventDrivenEngine()
     let handles = schedulables.map(schedulable =>
@@ -46,8 +46,8 @@ suite "event driven engine tests":
     check(engine.currentTime == 8)
 
   test "should allow clients run until the desired simulation time":
-    let times = @[50, 100, 150]
-    let schedulables = times.map(time => TestSchedulable(time: uint64(time)))
+    let times = @[50'u64, 100, 150]
+    let schedulables = times.map(time => TestSchedulable(time: time))
 
     let engine = EventDrivenEngine()
     engine.scheduleAll(schedulables)

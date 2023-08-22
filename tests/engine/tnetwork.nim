@@ -1,9 +1,9 @@
 import unittest
 
-import pkg/swarmsim/engine/eventdrivenengine
-import pkg/swarmsim/engine/network
-import pkg/swarmsim/engine/peer
-import pkg/swarmsim/engine/protocol
+import swarmsim/engine/eventdrivenengine
+import swarmsim/engine/network
+import swarmsim/engine/peer
+import swarmsim/engine/protocol
 
 type
   FakeProtocol = ref object of Protocol
