@@ -13,7 +13,7 @@ import pkg/swarmsim/timeutils
 
 proc getPeerArray(tracker: Peer): seq[PeerDescriptor] =
   DHTTracker(
-      tracker.getProtocol(DHTTracker.messageType).get()).peers
+      tracker.getProtocol(DHTTracker.protocolId).get()).peers
 
 proc getPeerIdArray(tracker: Peer): seq[int] =
   getPeerArray(tracker).map(p => p.peerId)
@@ -22,7 +22,7 @@ proc announcePeer(network: Network, tracker: Peer, peerId: int,
     delay: uint64 = 0) =
   network.send(
     PeerAnnouncement(receiver: tracker,
-      messageType: DHTTracker.messageType, peerId: peerId),
+      protocolId: DHTTracker.protocolId, peerId: peerId),
         delay.some).doAwait()
 
 suite "tracker node":

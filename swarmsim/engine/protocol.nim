@@ -15,5 +15,5 @@ method uncheckedDeliver(
 
 proc deliver*(self: Protocol, message: Message, engine: EventDrivenEngine,
     network: Network): void =
-  assert(self.messageType == message.messageType)
+  assert(self.protocolId == message.protocolId)
   self.uncheckedDeliver(message, engine, network)

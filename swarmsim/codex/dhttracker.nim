@@ -37,7 +37,7 @@ type
 let RandomShuffler = proc (arr: var seq[PeerDescriptor]) =
   discard arr.nextPermutation()
 
-proc messageType*(T: type DHTTracker): string = "DHTTracker"
+proc protocolId*(T: type DHTTracker): string = "DHTTracker"
 
 proc defaultExpiry*(T: type DHTTracker): Duration = 15.dminutes
 
@@ -53,7 +53,7 @@ proc new*(
     maxPeers: maxPeers,
     shuffler: shuffler,
     peers: initOrderedTable[int, PeerDescriptor](),
-    messageType: DHTTracker.messageType
+    protocolId: DHTTracker.protocolId
   )
 
 proc peers*(self: DHTTracker): seq[PeerDescriptor] = self.peers.values.toSeq()

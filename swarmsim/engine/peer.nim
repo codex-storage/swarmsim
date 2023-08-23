@@ -21,13 +21,13 @@ proc getProtocol*(self: Peer, protocolId: string): Option[Protocol] =
 
 proc deliver*(self: Peer, message: Message, engine: EventDrivenEngine,
     network: Network): void =
-  self.getProtocol(message.messageType).map(
+  self.getProtocol(message.protocolId).map(
     proc (p: Protocol): void = p.deliver(message, engine, network))
 
 proc initPeer(self: Peer, protocols: seq[Protocol]): Peer =
   # XXX integer indexes or an enum would be better, but this is easier
   for protocol in protocols:
-    self.protocols[protocol.messageType] = protocol
+    self.protocols[protocol.protocolId] = protocol
 
   self
 

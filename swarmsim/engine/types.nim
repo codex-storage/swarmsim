@@ -30,7 +30,7 @@ type
     ## A `Protocol` defines a P2P protocol. It handles messages meant for it,
     ## keeps internal state, and may expose services to other `Protocol`s within
     ## the same `Peer`.
-    messageType*: string ## "Type" of the message accepted by this protocol.
+    protocolId*: string
 
 type
   Peer* = ref object of RootObj
@@ -41,7 +41,7 @@ type
   Message* = ref object of RootObj
     ## A `Message` is a piece of data that is sent over the network. Its meaning
     ## is typically protocol-specific.
-    messageType*: string
+    protocolId*: string
     sender*: Option[Peer] = none(Peer)
     receiver*: Peer
 

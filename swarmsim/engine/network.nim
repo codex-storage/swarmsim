@@ -16,6 +16,9 @@ type
     network: Network
     message: Message
 
+# TODO: use distributions (or trace resampling) instead of a constant for link delay
+# TODO: model link capacity and implement downloads
+
 proc new*(
   T: type Network,
   engine: EventDrivenEngine,
