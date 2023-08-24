@@ -4,6 +4,7 @@ import std/sets
 import swarmsim/engine/eventdrivenengine
 import swarmsim/engine/network
 import swarmsim/engine/peer
+import swarmsim/engine/message
 
 import ../helpers/inbox
 
@@ -76,4 +77,20 @@ suite "peer":
     peer.deliver(m3, engine, network)
 
     check(i1.messages == @[m1, m2])
+
+
+  test "should deliver all message types when listening to Message.allMessages":
+    let i1 = Inbox(id: "protocol1", messageTypes: @[Message.allMessages])
+
+    let peer = Peer.new(protocols = @[Protocol i1])
+
+    let m1: Message = FreelyTypedMessage(receiver: peer, messageType: "m1")
+    let m2: Message = FreelyTypedMessage(receiver: peer, messageType: "m2")
+    let m3: Message = FreelyTypedMessage(receiver: peer, messageType: "m3")
+
+    peer.deliver(m1, engine, network)
+    peer.deliver(m2, engine, network)
+    peer.deliver(m3, engine, network)
+
+    check(i1.messages == @[m1, m2, m3])
 

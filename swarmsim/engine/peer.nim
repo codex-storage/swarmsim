@@ -24,12 +24,22 @@ proc getProtocol*(self: Peer, id: string): Option[Protocol] =
 proc addProtocol*(self: Peer, protocol: Protocol): void =
   self.protocols[protocol.id] = protocol
 
-proc deliver*(self: Peer, message: Message, engine: EventDrivenEngine,
-    network: Network): void =
-  self.dispatch.getOrDefault(message.messageType, @[]).apply(
+proc deliverForType(self: Peer, messageType: string, message: Message,
+    engine: EventDrivenEngine, network: Network): void =
+  self.dispatch.getOrDefault(messageType, @[]).apply(
     proc (p: Protocol): void = p.deliver(message, engine, network))
 
-proc initPeer(self: Peer, protocols: seq[Protocol]): Peer =
+proc deliver*(self: Peer, message: Message, engine: EventDrivenEngine,
+    network: Network): void =
+  self.deliverForType(message.messageType, message, engine, network)
+  self.deliverForType(Message.allMessages, message, engine, network)
+
+proc initPeer*(self: Peer, protocols: seq[Protocol],
+    peerId: Option[int] = none(int)): Peer =
+
+  self.peerId = peerId.get(rand(high(int)))
+  self.protocols = initTable[string, Protocol]()
+  self.dispatch = MultiTable[string, Protocol].new()
   # XXX integer indexes or an enum would be better, but this is easier
   for protocol in protocols:
     let protocol = protocol # https://github.com/nim-lang/Nim/issues/16740
@@ -47,11 +57,4 @@ proc new*(
   protocols: seq[Protocol],
   peerId: Option[int] = none(int),
 ): Peer =
-  # XXX I can't have put this in the init proc as that would mean allowing public
-  #   write access to every field in Peer. Not sure how to solve this in nim.
-  let peerId = peerId.get(rand(high(int)))
-  initPeer(Peer(
-    protocols: initTable[string, Protocol](),
-    peerId: peerId,
-    dispatch: MultiTable[string, Protocol].new()
-    ), protocols)
+  initPeer(Peer(), protocols, peerId)

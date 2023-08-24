@@ -8,6 +8,8 @@ method `messageType`*(self: Message): string {.base.} =
 
 method `messageType`*(self: FreelyTypedMessage): string = self.messageType
 
+proc allMessages*(self: type Message): string = "*"
+
 func typeName(typeDef: NimNode): Option[NimNode] =
   expectKind typeDef, nnkTypeDef
 
