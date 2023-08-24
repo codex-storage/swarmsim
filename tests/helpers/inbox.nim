@@ -7,7 +7,7 @@ type
   Inbox* = ref object of Protocol
     messages*: seq[Message]
 
-method uncheckedDeliver*(
+method deliver*(
   self: Inbox,
   message: Message,
   engine: EventDrivenEngine,

@@ -109,8 +109,8 @@ method atScheduledTime*(self: ExpirationTimer, engine: EventDrivenEngine): void 
 proc sampleSwarm(self: DHTTracker, message: SampleSwarm, network: Network) =
   discard
 
-method uncheckedDeliver*(self: DHTTracker, message: Message,
-    engine: EventDrivenEngine, network: Network) =
+method deliver*(self: DHTTracker, message: Message, engine: EventDrivenEngine,
+    network: Network) =
 
   if message of PeerAnnouncement:
     self.addPeer(PeerAnnouncement(message), engine)
