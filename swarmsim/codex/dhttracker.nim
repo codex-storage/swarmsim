@@ -5,6 +5,7 @@ import std/tables
 import std/sequtils
 
 import ../engine
+import ../engine/message
 
 export protocol
 export options
@@ -24,20 +25,21 @@ type
     peers: OrderedTable[int, PeerDescriptor]
     shuffler: ArrayShuffler
 
-  PeerAnnouncement* = ref object of Message
-    peerId*: int
-
-  SampleSwarm* = ref object of Message
-    numPeers: uint
 
   ExpirationTimer* = ref object of SchedulableEvent
     peerId*: int
     tracker: DHTTracker
 
+typedMessage:
+  type
+    PeerAnnouncement* = ref object of Message
+      peerId*: int
+
+    SampleSwarm* = ref object of Message
+      numPeers: uint
+
 let RandomShuffler = proc (arr: var seq[PeerDescriptor]) =
   discard arr.nextPermutation()
-
-proc protocolId*(T: type DHTTracker): string = "DHTTracker"
 
 proc defaultExpiry*(T: type DHTTracker): Duration = 15.dminutes
 
@@ -49,11 +51,12 @@ proc new*(
 ): DHTTracker =
   DHTTracker(
     # This should in general be safe as those are always positive.
+    id: "DHTTracker",
     peerExpiration: peerExpiration,
     maxPeers: maxPeers,
     shuffler: shuffler,
     peers: initOrderedTable[int, PeerDescriptor](),
-    protocolId: DHTTracker.protocolId
+    messageTypes: @[PeerAnnouncement.messageType, SampleSwarm.messageType]
   )
 
 proc peers*(self: DHTTracker): seq[PeerDescriptor] = self.peers.values.toSeq()

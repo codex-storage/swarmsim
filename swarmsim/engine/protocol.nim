@@ -1,3 +1,5 @@
+import typetraits
+
 import ./types
 import ./eventdrivenengine
 
@@ -15,5 +17,6 @@ method uncheckedDeliver(
 
 proc deliver*(self: Protocol, message: Message, engine: EventDrivenEngine,
     network: Network): void =
-  assert(self.protocolId == message.protocolId)
   self.uncheckedDeliver(message, engine, network)
+
+proc protocolName*[T: Protocol](self: type T): string = name(T)
