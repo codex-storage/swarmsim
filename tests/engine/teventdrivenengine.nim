@@ -93,7 +93,17 @@ suite "event driven engine tests":
 
     check(engine.currentTime == 10)
 
+  test "should run to completion":
+    let times = @[1'u64, 2, 3, 4, 5, 6, 7, 8]
 
+    let engine = EventDrivenEngine()
 
+    let handles = times.map(time =>
+      engine.awaitableSchedule(TestSchedulable(time: time)))
 
+    check(handles.allIt(it.schedulable.completed) == false)
 
+    engine.run()
+
+    check(engine.currentTime == 8)
+    check(handles.allIt(it.schedulable.completed) == true)

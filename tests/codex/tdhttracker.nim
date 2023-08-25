@@ -36,7 +36,6 @@ suite "tracker node":
     )
 
     let network = Network.new(engine = engine)
-    network.add(trackerPeer)
 
   test "should retain published descriptors":
     announcePeer(network, trackerPeer, 25)

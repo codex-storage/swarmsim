@@ -22,9 +22,6 @@ suite "network":
 
     let network = Network.new(engine = engine, defaultLinkDelay = 20)
 
-    network.add(p1)
-    network.add(p2)
-
     let m1: Message = FreelyTypedMessage(receiver: p1, messageType: "m")
     let m2: Message = FreelyTypedMessage(receiver: p2, messageType: "m")
 

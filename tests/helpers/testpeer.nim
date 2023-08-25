@@ -1,5 +1,4 @@
 import std/options
-import std/random
 
 import swarmsim/engine
 import swarmsim/engine/peer
@@ -15,11 +14,16 @@ proc new*(
   peerId: Option[int] = none(int),
 ): TestPeer =
   let peer: TestPeer = TestPeer(network: network)
-  discard peer.initPeer(protocols = @[Protocol Inbox()])
+  discard peer.initPeer(
+    protocols = @[Protocol Inbox(
+        protocolId: Inbox.typeId,
+        messageTypes: @["*"]
+      )
+    ])
   peer
 
 proc inbox*(peer: TestPeer): Inbox =
-  Inbox peer.getProtocol(Inbox.protocolName).get()
+  Inbox peer.getProtocol(Inbox.typeId).get()
 
 proc send*(self: TestPeer, msg: Message): ScheduledEvent =
   msg.sender = Peer(self).some

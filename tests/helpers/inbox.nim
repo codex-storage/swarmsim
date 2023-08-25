@@ -2,11 +2,13 @@ import swarmsim/engine/types
 import swarmsim/engine/peer
 import swarmsim/engine/protocol
 import swarmsim/engine/network
+import swarmsim/lib/withtypeid
 
-type
-  Inbox* = ref object of Protocol
-    protocolId*: string
-    messages*: seq[Message]
+withTypeId:
+  type
+    Inbox* = ref object of Protocol
+      protocolId*: string
+      messages*: seq[Message]
 
 method deliver*(
   self: Inbox,
