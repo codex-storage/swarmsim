@@ -13,7 +13,7 @@ import pkg/swarmsim/timeutils
 
 proc getPeerArray(tracker: Peer): seq[PeerDescriptor] =
   DHTTracker(
-      tracker.getProtocol(DHTTracker.protocolName).get()).peers
+      tracker.getProtocol(DHTTracker.typeId).get()).peers
 
 proc getPeerIdArray(tracker: Peer): seq[int] =
   getPeerArray(tracker).map(p => p.peerId)

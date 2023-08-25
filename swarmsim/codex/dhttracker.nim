@@ -18,25 +18,24 @@ type
 
 type ArrayShuffler = proc (arr: var seq[PeerDescriptor]): void
 
-type
-  DHTTracker* = ref object of Protocol
-    peerExpiration*: Duration
-    maxPeers*: uint
-    peers: OrderedTable[int, PeerDescriptor]
-    shuffler: ArrayShuffler
-
-
-  ExpirationTimer* = ref object of SchedulableEvent
-    peerId*: int
-    tracker: DHTTracker
-
-typedMessage:
+withTypeId:
   type
+    DHTTracker* = ref object of Protocol
+      peerExpiration*: Duration
+      maxPeers*: uint
+      peers: OrderedTable[int, PeerDescriptor]
+      shuffler: ArrayShuffler
+
     PeerAnnouncement* = ref object of Message
       peerId*: int
 
     SampleSwarm* = ref object of Message
       numPeers: uint
+
+type
+  ExpirationTimer* = ref object of SchedulableEvent
+    peerId*: int
+    tracker: DHTTracker
 
 let RandomShuffler = proc (arr: var seq[PeerDescriptor]) =
   discard arr.nextPermutation()
@@ -51,12 +50,11 @@ proc new*(
 ): DHTTracker =
   DHTTracker(
     # This should in general be safe as those are always positive.
-    id: "DHTTracker",
     peerExpiration: peerExpiration,
     maxPeers: maxPeers,
     shuffler: shuffler,
     peers: initOrderedTable[int, PeerDescriptor](),
-    messageTypes: @[PeerAnnouncement.messageType, SampleSwarm.messageType]
+    messageTypes: @[PeerAnnouncement.typeId, SampleSwarm.typeId]
   )
 
 proc peers*(self: DHTTracker): seq[PeerDescriptor] = self.peers.values.toSeq()

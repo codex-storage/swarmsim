@@ -7,14 +7,15 @@ import swarmsim/engine/peer
 import swarmsim/engine/protocol
 
 import ../helpers/inbox
+import ../helpers/types
 
 suite "network":
   test "should dispatch message to the correct peer":
 
     let engine = EventDrivenEngine()
 
-    let i1 = Inbox(id: "inbox", messageTypes: @["m"])
-    let i2 = Inbox(id: "inbox", messageTypes: @["m"])
+    let i1 = Inbox(protocolId: "inbox", messageTypes: @["m"])
+    let i2 = Inbox(protocolId: "inbox", messageTypes: @["m"])
 
     let p1 = Peer.new(protocols = @[Protocol i1])
     let p2 = Peer.new(protocols = @[Protocol i2])

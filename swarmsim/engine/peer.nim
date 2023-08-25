@@ -21,8 +21,8 @@ proc getProtocol*(self: Peer, id: string): Option[Protocol] =
 
   none(Protocol)
 
-proc addProtocol*(self: Peer, protocol: Protocol): void =
-  self.protocols[protocol.id] = protocol
+proc addProtocol*[T: Protocol](self: Peer, protocol: T): void =
+  self.protocols[protocol.protocolId] = protocol
 
 proc deliverForType(self: Peer, messageType: string, message: Message,
     engine: EventDrivenEngine, network: Network): void =
@@ -44,7 +44,7 @@ proc initPeer*(self: Peer, protocols: seq[Protocol],
   for protocol in protocols:
     let protocol = protocol # https://github.com/nim-lang/Nim/issues/16740
 
-    self.protocols[protocol.id] = protocol
+    self.protocols[protocol.protocolId] = protocol
     protocol.messageTypes.apply(proc (m: string): void =
       self.dispatch.add(m, protocol))
 

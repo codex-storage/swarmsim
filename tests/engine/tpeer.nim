@@ -7,6 +7,7 @@ import swarmsim/engine/peer
 import swarmsim/engine/message
 
 import ../helpers/inbox
+import ../helpers/types
 
 # We need this here as otherwise for some reason the nim compiler trips.
 proc `$`*(m: Message): string = repr m
@@ -32,8 +33,8 @@ suite "peer":
     check(not peerSet.contains(p1))
 
   test "should dispatch message to correct protocol":
-    let i1 = Inbox(id: "protocol1", messageTypes: @["m1"])
-    let i2 = Inbox(id: "protocol2", messageTypes: @["m2"])
+    let i1 = Inbox(protocolId: "protocol1", messageTypes: @["m1"])
+    let i2 = Inbox(protocolId: "protocol2", messageTypes: @["m2"])
 
     let peer = Peer.new(protocols = @[Protocol i1, i2])
 
@@ -51,8 +52,8 @@ suite "peer":
     check(i2.messages == @[m2])
 
   test "should dispatch a message to multiple protocols if they are listening on the same message type":
-    let i1 = Inbox(id: "protocol1", messageTypes: @["m1"])
-    let i2 = Inbox(id: "protocol2", messageTypes: @["m1"])
+    let i1 = Inbox(protocolId: "protocol1", messageTypes: @["m1"])
+    let i2 = Inbox(protocolId: "protocol2", messageTypes: @["m1"])
 
     let peer = Peer.new(protocols = @[Protocol i1, i2])
 
@@ -64,7 +65,7 @@ suite "peer":
     check(i2.messages == @[m1])
 
   test "should allow protocol to listen on multiple message types":
-    let i1 = Inbox(id: "protocol1", messageTypes: @["m1", "m2"])
+    let i1 = Inbox(protocolId: "protocol1", messageTypes: @["m1", "m2"])
 
     let peer = Peer.new(protocols = @[Protocol i1])
 
@@ -80,7 +81,7 @@ suite "peer":
 
 
   test "should deliver all message types when listening to Message.allMessages":
-    let i1 = Inbox(id: "protocol1", messageTypes: @[Message.allMessages])
+    let i1 = Inbox(protocolId: "protocol1", messageTypes: @[Message.allMessages])
 
     let peer = Peer.new(protocols = @[Protocol i1])
 

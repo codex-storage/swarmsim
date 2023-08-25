@@ -4,11 +4,13 @@ import std/sets
 import std/options
 import std/random
 
+import ../lib/withtypeid
 import ../lib/multitable
 
 export heapqueue
 export option
 export random
+export withtypeid
 
 type
   SchedulableEvent* = ref object of RootObj
@@ -32,7 +34,6 @@ type
     ## A `Protocol` defines a P2P protocol. It handles messages meant for it,
     ## keeps internal state, and may expose services to other `Protocol`s within
     ## the same `Peer`.
-    id*: string
     messageTypes*: seq[string]
 
 type
@@ -48,11 +49,6 @@ type
     sender*: Option[Peer] = none(Peer)
     receiver*: Peer
 
-  FreelyTypedMessage* = ref object of Message
-    ## A `FreelyTypedMessage` is a `Message` that can be of any type.
-    ##
-    messageType*: string
-
 type
   Network* = ref object of RootObj
     ## A `Network` is a collection of `Peer`s that can communicate with each
@@ -61,3 +57,4 @@ type
     engine*: EventDrivenEngine
     defaultLinkDelay*: uint64
     peers*: HashSet[Peer] # TODO: use an array
+
