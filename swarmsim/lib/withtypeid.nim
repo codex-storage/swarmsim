@@ -16,6 +16,10 @@
 
 import options
 import macros
+import sets
+import strutils
+
+var typeIds {.compileTime.}: HashSet[string]
 
 method `typeId`*(self: RootObj): string {.base.} =
   ## Returns the type id of an object. This is currently a string and
@@ -40,21 +44,7 @@ func typeName(typeDef: NimNode): Option[NimNode] =
   else:
     none(NimNode)
 
-macro withTypeId*(body: untyped): untyped =
-  ## Creates a type with a `typeId` method and a proc bound to the type
-  ## itself which return the type's name.
-  runnableExamples:
-    withTypeId:
-      type
-        Foo = object of RootObj
-        Bar* = object of RootObj
-
-    doAssert Foo.typeId == "Foo"
-    doAssert Bar.typeId == "Bar"
-
-    doAssert Foo().typeId == "Foo"
-    doAssert Bar().typeId == "Bar"
-
+proc withTypeId(nameCheckOnly: bool, body: NimNode): NimNode =
   expectKind body, nnkStmtList
   expectKind body[0], nnkTypeSection
 
@@ -64,13 +54,23 @@ macro withTypeId*(body: untyped): untyped =
 
     let maybeTypename = typeName(statement)
     if maybeTypename.isNone:
+      echo treeRepr body
       error("unable to get type name from AST. Sorry.")
 
     let typeIdent = maybeTypename.get
-    let typeName = newLit(typeIdent.strVal)
+    let typeName = typeIdent.strVal
+    let typeNameLit = newLit(typeName)
+
+    if typeName in typeIds:
+      error("type name already in use: " & typeName)
+
+    typeIds.incl(typeName)
+
+    if nameCheckOnly:
+      return body
 
     let typeProc = quote do:
-      proc typeId*(self: type `typeIdent`): string = `typeName`
+      proc typeId*(self: type `typeIdent`): string = `typeNameLit`
 
     let instanceProc = quote do:
       method typeId*(self: `typeIdent`): string = `typeIdent`.typeId
@@ -84,3 +84,36 @@ macro withTypeId*(body: untyped): untyped =
     body.add(instanceProc)
 
   return body
+
+macro withTypeId*(body: untyped): untyped =
+  ## Creates a type with a `typeId` method and a proc bound to the type
+  ## itself which return the type's name.
+  ##
+  runnableExamples:
+    withTypeId:
+      type
+        Foo = object of RootObj
+        Bar* = object of RootObj
+
+    doAssert Foo.typeId == "Foo"
+    doAssert Bar.typeId == "Bar"
+
+    doAssert Foo().typeId == "Foo"
+    doAssert Bar().typeId == "Bar"
+
+  withTypeId(false, body)
+
+macro withTypeId*(nameCheckOnly: untyped, body: untyped): untyped =
+  ## Same as `withTypeId`, but allows disabling the generation of the
+  ## type name accessors. This is used for testing and likely not useful
+  ## for anything else.
+  ##
+  expectKind nameCheckOnly, nnkIdent
+
+  try:
+    # I know this looks weird, but the other option is doing a typed macro,
+    # and this would probably mean rewriting the entire macro. So parseBool
+    # it is.
+    return withTypeId(parseBool(nameCheckOnly.strVal), body)
+  except ValueError:
+    error("expected boolean literal (true/false), got: " & nameCheckOnly.strVal)

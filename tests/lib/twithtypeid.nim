@@ -2,6 +2,13 @@ import unittest
 
 import swarmsim/lib/withtypeid
 
+import ../helpers/compiler
+
+# This is required by "should not allow defining two types with the same name
+# in separate modules". Since nim allows us to do imports only at the top, it
+# has to be here.
+import ./repeated
+
 withTypeId:
   type
     Foo = object of RootObj
@@ -36,3 +43,12 @@ suite "withtypeid":
   test "should raise an error when trying to query the id of a non-annotated ref type":
     expect(Defect):
       discard NonAnnotatedRef().typeId
+
+  test "should not allow defining two types with the same name in separate modules":
+    check:
+      notCompiles:
+        withTypeId(true):
+          type
+            RepeatedName = object of RootObj
+
+{.warning[UnusedImport]: off.}
