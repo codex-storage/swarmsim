@@ -2,6 +2,7 @@ import std/options
 import std/random
 import std/hashes
 import sequtils
+import sugar
 
 import ./types
 import ./message
@@ -14,6 +15,33 @@ export multitable
 export protocol
 export eventdrivenengine
 export Peer
+
+type
+  PeerLifecycleChange* = ref object of SchedulableEvent
+    peer: Peer
+    network: Network
+    event: LifecycleEventType
+
+method atScheduledTime*(self: PeerLifecycleChange,
+    engine: EventDrivenEngine): void =
+
+  let peer = self.peer
+  let oldState = peer.up
+
+  # XXX We're somewhat lax with state machine transitions and will allow
+  # self-transitions...
+  let newState = case self.event:
+    of started, up:
+      true
+    of down:
+      false
+
+  peer.up = newState
+
+  # ... but self-transitions do not get reported downstream.
+  if oldState != newState:
+    self.peer.protocols.values.toSeq.apply(p =>
+        p.onLifecycleEventType(self.peer, self.event, self.network))
 
 proc getProtocol*(self: Peer, id: string): Option[Protocol] =
   if self.protocols.hasKey(id):
@@ -33,6 +61,21 @@ proc deliver*(self: Peer, message: Message, engine: EventDrivenEngine,
     network: Network): void =
   self.deliverForType(message.messageType, message, engine, network)
   self.deliverForType(Message.allMessages, message, engine, network)
+
+proc scheduleLifecycleChange*(self: Peer, event: LifecycleEventType,
+    network: Network, time: uint64): void =
+  network.engine.schedule(PeerLifecycleChange(
+    peer: self,
+    network: network,
+    event: event,
+    time: time
+  ))
+
+proc startAt*(self: Peer, network: Network, time: uint64): void =
+  self.scheduleLifecycleChange(started, network, time)
+
+proc start*(self: Peer, network: Network): void =
+  self.startAt(network, network.engine.currentTime)
 
 proc initPeer*(self: Peer, protocols: seq[Protocol],
     peerId: Option[int] = none(int)): Peer =

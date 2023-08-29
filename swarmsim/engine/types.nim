@@ -37,8 +37,14 @@ type
     messageTypes*: seq[string]
 
 type
+  LifecycleEventType* = enum
+    started
+    up
+    down
+
   Peer* = ref object of RootObj
     peerId*: int
+    up*: bool = false
     protocols*: Table[string, Protocol]
     dispatch*: MultiTable[string, Protocol]
 

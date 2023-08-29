@@ -9,6 +9,8 @@ import swarmsim/engine/message
 import ../helpers/inbox
 import ../helpers/types
 
+import pretty
+
 # We need this here as otherwise for some reason the nim compiler trips.
 proc `$`*(m: Message): string = repr m
 
@@ -79,7 +81,6 @@ suite "peer":
 
     check(i1.messages == @[m1, m2])
 
-
   test "should deliver all message types when listening to Message.allMessages":
     let i1 = Inbox(protocolId: "protocol1", messageTypes: @[Message.allMessages])
 
@@ -95,3 +96,36 @@ suite "peer":
 
     check(i1.messages == @[m1, m2, m3])
 
+  test "should be up after start":
+    let i1 = Inbox(protocolId: "lifecycleListener", messageTypes: @[])
+    let peer = Peer.new(protocols = @[Protocol i1])
+
+    peer.startAt(network, 5)
+
+    check(not peer.up)
+
+    engine.run()
+
+    check((repr i1.events) == (repr @[
+      LifecycleEvent(event: started, time: 5.uint64)]))
+
+    check(peer.up)
+
+  test "should not be up after going down":
+    let i1 = Inbox(protocolId: "lifecycleListener", messageTypes: @[])
+
+    let peer = Peer.new(protocols = @[Protocol i1])
+
+    peer.start(network)
+    peer.scheduleLifecycleChange(
+      event = down,
+      network = network,
+      time = 10
+    )
+
+    engine.run()
+
+    check((repr i1.events) == (repr @[
+      LifecycleEvent(event: started, time: 0),
+      LifecycleEvent(event: down, time: 10)
+    ]))

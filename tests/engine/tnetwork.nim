@@ -10,6 +10,7 @@ import ../helpers/inbox
 import ../helpers/types
 
 suite "network":
+
   test "should dispatch message to the correct peer":
 
     let engine = EventDrivenEngine()

@@ -9,9 +9,11 @@ import ../helpers/testpeer
 
 suite "block exchange":
 
-  test "should respond to want-block message with a list of the blocks it has":
+  setup:
     let engine = EventDrivenEngine()
     let network = Network(engine: engine)
+
+  test "should respond to want-have message with a list of the blocks it has":
     let sender = TestPeer.new(network)
 
     let bex = BlockExchangeProtocol.new()
@@ -41,3 +43,6 @@ suite "block exchange":
     let response = Have(sender.inbox.messages[0])
 
     check(response.haves == toIntSet([0, 1, 4]))
+
+
+
