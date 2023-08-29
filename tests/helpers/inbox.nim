@@ -25,7 +25,7 @@ method deliver*(
 
 method `protocolId`*(self: Inbox): string = self.protocolId
 
-method onLifecycleEventType*(
+method onPeerLifecycleChange*(
   self: Inbox,
   peer: Peer,
   event: LifecycleEventType,

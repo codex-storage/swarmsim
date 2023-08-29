@@ -15,7 +15,7 @@ method deliver*(
 ): void {.base.} =
   raise newException(CatchableError, "Method without implementation override")
 
-method onLifecycleEventType*(
+method onPeerLifecycleChange*(
   self: Protocol,
   peer: Peer,
   event: LifecycleEventType,

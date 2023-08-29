@@ -41,7 +41,7 @@ method atScheduledTime*(self: PeerLifecycleChange,
   # ... but self-transitions do not get reported downstream.
   if oldState != newState:
     self.peer.protocols.values.toSeq.apply(p =>
-        p.onLifecycleEventType(self.peer, self.event, self.network))
+        p.onPeerLifecycleChange(self.peer, self.event, self.network))
 
 proc getProtocol*(self: Peer, id: string): Option[Protocol] =
   if self.protocols.hasKey(id):
