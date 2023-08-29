@@ -9,8 +9,6 @@ import swarmsim/engine/message
 import ../helpers/inbox
 import ../helpers/types
 
-import pretty
-
 # We need this here as otherwise for some reason the nim compiler trips.
 proc `$`*(m: Message): string = repr m
 
