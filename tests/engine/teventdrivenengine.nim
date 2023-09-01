@@ -107,3 +107,22 @@ suite "event driven engine tests":
 
     check(engine.currentTime == 8)
     check(handles.allIt(it.schedulable.completed) == true)
+
+  test "should allow clients to run until a predicate is satistified":
+    let times = @[50'u64, 100, 150, 200]
+
+    let engine = EventDrivenEngine()
+
+    times.apply((time: uint64) => engine.schedule(TestSchedulable(time: time)))
+
+    const stopIndex = 3
+    var index = 0
+
+    check(engine.runUntil(
+      proc (engine: EventDrivenEngine, schedulable: SchedulableEvent): bool =
+        index += 1
+        index == stopIndex
+    ))
+
+    check(index == stopIndex)
+    check(engine.currentTime == times[stopIndex - 1])

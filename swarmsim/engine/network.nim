@@ -27,8 +27,11 @@ proc new*(
     defaultLinkDelay: defaultLinkDelay
   )
 
-proc send*(self: Network, message: Message,
-  linkDelay: Option[uint64] = none(uint64)): ScheduledEvent =
+proc send*(
+  self: Network,
+  message: Message,
+  linkDelay: Option[uint64] = none(uint64)
+): ScheduledEvent =
 
   let delay = linkDelay.get(self.defaultLinkDelay)
 

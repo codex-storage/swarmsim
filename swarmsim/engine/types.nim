@@ -1,6 +1,5 @@
 import std/heapqueue
 import std/tables
-import std/sets
 import std/options
 import std/random
 
@@ -36,15 +35,20 @@ type
     ## the same `Peer`.
     messageTypes*: seq[string]
 
-type
   LifecycleEventType* = enum
     started
     up
     down
 
   Peer* = ref object of RootObj
+    ## A `Peer` in our `Network` which runs `Protocols`. Together with other
+    ## `Peer`s, forms a P2P network.
     peerId*: int
     up*: bool = false
+
+    # FIXME these are expensive data structures to have per-peer, and can
+    #   significantly affect memory scalability. If this turns out to be the
+    #   memory bottleneck, we can fliweight those by using fixed peer types.
     protocols*: Table[string, Protocol]
     dispatch*: MultiTable[string, Protocol]
 
@@ -57,10 +61,8 @@ type
 
 type
   Network* = ref object of RootObj
-    ## A `Network` is a collection of `Peer`s that can communicate with each
-    ## other.
+    ## A `Network` allows `Peer`s to send `Message`s to one another.
     ##
     engine*: EventDrivenEngine
     defaultLinkDelay*: uint64
-    peers*: HashSet[Peer] # TODO: use an array
 

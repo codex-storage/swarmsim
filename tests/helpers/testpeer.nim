@@ -25,6 +25,6 @@ proc new*(
 proc inbox*(peer: TestPeer): Inbox =
   Inbox peer.getProtocol(Inbox.typeId).get()
 
-proc send*(self: TestPeer, msg: Message): ScheduledEvent =
+proc send*(self: TestPeer, msg: var Message): ScheduledEvent =
   msg.sender = Peer(self).some
   self.network.send(msg)
