@@ -19,7 +19,7 @@ template getDefault*[K, V](self: var Table[K, V], key: K, alias,
       # like withValue, c is a pointer.
       c[] += 1
 
-    echo table["hello"] # 2
+    doAssert table["hello"] == 2
 
   self.withValue(key, v):
     var alias {.inject.} = v
