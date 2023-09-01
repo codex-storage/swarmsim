@@ -48,15 +48,13 @@ proc neighborAdded*(
   manifest: Manifest,
   network: Network
 ) =
-  discard network.send(
-    WantHave(
-      request: true,
-      sender: parent.some,
-      receiver: neighbor,
-      cid: manifest.cid,
-      haves: self.newSession(manifest).blocks
-    )
-  )
+  discard network.send(WantHave(
+    request: true,
+    sender: parent.some,
+    receiver: neighbor,
+    cid: manifest.cid,
+    haves: self.newSession(manifest).blocks
+  ))
 
 method deliver*(
   self: BlockExchangeProtocol,
